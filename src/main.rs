@@ -297,17 +297,19 @@ fn game_over_system(
         game_over = true;
     }
 
-    for pipe in pipes_query.iter() {
-        if collide(
-            transform.translation,
-            Vec2::new(45., 45.),
-            pipe.translation + Vec3::new(PIPE_WIDTH / 2., -PIPE_HEIGHT / 2., 0.),
-            Vec2::new(PIPE_WIDTH, PIPE_HEIGHT),
-        )
-        .is_some()
-        {
-            game_over = true;
-            break;
+    if !game_over {
+        for pipe in pipes_query.iter() {
+            if collide(
+                transform.translation,
+                Vec2::new(45., 45.),
+                pipe.translation + Vec3::new(PIPE_WIDTH / 2., -PIPE_HEIGHT / 2., 0.),
+                Vec2::new(PIPE_WIDTH, PIPE_HEIGHT),
+            )
+            .is_some()
+            {
+                game_over = true;
+                break;
+            }
         }
     }
 
