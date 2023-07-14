@@ -66,7 +66,7 @@ fn spawn_player(
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     asset_server: Res<AssetServer>,
 ) {
-    let initial_position = Transform::from_xyz(-150., 0., 0.).with_scale(SCALE.clone());
+    let initial_position = Transform::from_xyz(-150., 0., 0.).with_scale(SCALE);
 
     let texture_handle = asset_server.load("bird.png");
     let texture_atlas =
@@ -142,8 +142,7 @@ fn spawn_pipes_system(mut commands: Commands, asset: Res<AssetServer>) {
         Velocity { x: -SPEED, y: 0. },
         SpriteBundle {
             texture: texture.clone(),
-            transform: Transform::from_xyz(400., gap_top + PIPE_HEIGHT, 0.)
-                .with_scale(SCALE.clone()),
+            transform: Transform::from_xyz(400., gap_top + PIPE_HEIGHT, 0.).with_scale(SCALE),
             sprite: Sprite {
                 flip_y: true,
                 anchor: Anchor::TopLeft,
@@ -156,7 +155,7 @@ fn spawn_pipes_system(mut commands: Commands, asset: Res<AssetServer>) {
         Pipe,
         Velocity { x: -SPEED, y: 0. },
         SpriteBundle {
-            transform: Transform::from_xyz(400., gap_bottom, 0.).with_scale(SCALE.clone()),
+            transform: Transform::from_xyz(400., gap_bottom, 0.).with_scale(SCALE),
             texture,
             sprite: Sprite {
                 anchor: Anchor::TopLeft,
@@ -189,7 +188,7 @@ fn spawn_floor_system(mut commands: Commands, asset: Res<AssetServer>) {
                 -WINDOW_HEIGHT / 2. + FLOOR_HEIGHT,
                 10.,
             )
-            .with_scale(SCALE.clone()),
+            .with_scale(SCALE),
             sprite: Sprite {
                 anchor: Anchor::TopLeft,
                 ..Default::default()
@@ -210,7 +209,7 @@ fn spawn_floor_system(mut commands: Commands, asset: Res<AssetServer>) {
                 -WINDOW_HEIGHT / 2. + FLOOR_HEIGHT,
                 10.,
             )
-            .with_scale(SCALE.clone()),
+            .with_scale(SCALE),
             sprite: Sprite {
                 anchor: Anchor::TopLeft,
                 ..Default::default()
@@ -234,7 +233,7 @@ fn spawn_background_system(mut commands: Commands, asset: Res<AssetServer>) {
                 WINDOW_HEIGHT / 2.,
                 0.,
             )
-            .with_scale(SCALE.clone()),
+            .with_scale(SCALE),
             sprite: Sprite {
                 anchor: Anchor::TopLeft,
                 ..Default::default()
@@ -251,7 +250,7 @@ fn spawn_background_system(mut commands: Commands, asset: Res<AssetServer>) {
         SpriteBundle {
             texture: asset.load("bg.png"),
             transform: Transform::from_xyz(-WINDOW_WIDTH / 2., WINDOW_HEIGHT / 2., 0.)
-                .with_scale(SCALE.clone()),
+                .with_scale(SCALE),
             sprite: Sprite {
                 anchor: Anchor::TopLeft,
                 ..Default::default()
@@ -278,7 +277,7 @@ fn infinite_scrolling_system(mut query: Query<(&mut Transform, &InfiniteScrollin
 }
 
 fn gravity_system(time: Res<Time>, mut query: Query<(&mut Velocity, &Mass)>) {
-    let acceleration = 9.8 * time.delta_seconds() as f32;
+    let acceleration = 9.8 * time.delta_seconds();
 
     for (mut velocity, ..) in query.iter_mut() {
         velocity.y -= acceleration;
@@ -287,12 +286,12 @@ fn gravity_system(time: Res<Time>, mut query: Query<(&mut Velocity, &Mass)>) {
 
 fn game_over_system(
     mut next_state: ResMut<NextState<GameState>>,
-    mut player_query: Query<(&mut Transform, &mut Velocity), With<Player>>,
-    pipes_query: Query<&Transform, (Without<Player>, With<Pipe>)>,
+    player_query: Query<&Transform, With<Player>>,
+    pipes_query: Query<&Transform, With<Pipe>>,
 ) {
     let mut game_over = false;
 
-    let (mut transform, mut velocity) = player_query.single_mut();
+    let transform = player_query.single();
 
     if transform.translation.y < -WINDOW_HEIGHT / 2. + FLOOR_HEIGHT {
         game_over = true;
